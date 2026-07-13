@@ -1,4 +1,4 @@
-// Variables globales
+// Variables globales1
 let startTime = Date.now();
 let totalDistance = 0; 
 
