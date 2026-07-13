@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Tracker</title>
+</head>
+<body>
+    <h1>Datos del GPS</h1>
+    <p>Latitud: <span id="lat">Esperando...</span></p>
+    <p>Longitud: <span id="lng">Esperando...</span></p>
+
+    <script>
+        // Cambia la IP por la de tu ESP32
+        const IP_ESP32 = "http://192.168.1.11/coords";
+
+        async function obtenerDatos() {
+            try {
+                const respuesta = await fetch(IP_ESP32);
+                const datos = await respuesta.json();
+                
+                document.getElementById('lat').innerText = datos.lat;
+                document.getElementById('lng').innerText = datos.lng;
+                
+                console.log("Datos recibidos:", datos);
+            } catch (error) {
+                console.error("No se pudo conectar al ESP32:", error);
+            }
+        }
+
+        // Ejecutar cada 2 segundos
+        setInterval(obtenerDatos, 2000);
+    </script>
+</body>
+</html>
