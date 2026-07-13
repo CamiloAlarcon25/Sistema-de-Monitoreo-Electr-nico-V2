@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GPS Tracker</title>
+    <title>GPS Tracker Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 600px; width: 100%; }
+        body { margin: 0; font-family: sans-serif; }
+    </style>
 </head>
 <body>
-    <h1>Datos del GPS</h1>
-    <p>Latitud: <span id="lat">Esperando...</span></p>
-    <p>Longitud: <span id="lng">Esperando...</span></p>
+    <div id="map"></div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Cambia la IP por la de tu ESP32
-        const IP_ESP32 = "http://192.168.1.11/coords";
+        const map = L.map('map').setView([0, 0], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        let marker = L.marker([0, 0]).addTo(map);
+        let polyline = L.polyline([], {color: 'blue'}).addTo(map);
 
-        async function obtenerDatos() {
+        async function actualizarMapa() {
             try {
-                const respuesta = await fetch(IP_ESP32);
-                const datos = await respuesta.json();
-                
-                document.getElementById('lat').innerText = datos.lat;
-                document.getElementById('lng').innerText = datos.lng;
-                
-                console.log("Datos recibidos:", datos);
-            } catch (error) {
-                console.error("No se pudo conectar al ESP32:", error);
-            }
+                const response = await fetch('http://192.168.1.11/coords'); // CAMBIA TU IP
+                const data = await response.json();
+                const lat = parseFloat(data.lat);
+                const lng = parseFloat(data.lng);
+
+                const newLatLng = [lat, lng];
+                marker.setLatLng(newLatLng);
+                polyline.addLatLng(newLatLng);
+                map.panTo(newLatLng);
+            } catch (e) { console.error("Error conectando al ESP32"); }
         }
 
-        // Ejecutar cada 2 segundos
-        setInterval(obtenerDatos, 2000);
+        setInterval(actualizarMapa, 3000);
     </script>
 </body>
 </html>
