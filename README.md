@@ -4,7 +4,7 @@ Bienvenido a la segunda versión del **Proyecto de Monitoreo Electrónico**. Est
 
 ## 🌐 Acceso a la App
 Puedes visualizar la interfaz de monitoreo en el siguiente enlace:
-👉 **[Ir a GPS Tracker Pro](https://miloalarcon25.github.io/)**
+👉 **[Ir a GPS Tracker Pro](https://camiloalarcon25.github.io/Sistema-de-Monitoreo-Electr-nico-V2/)**
 
 ---
 
@@ -20,7 +20,7 @@ Puedes visualizar la interfaz de monitoreo en el siguiente enlace:
 
 | Visualización en Navegador (App) | Prototipo Montado (Hardware) |
 | :---: | :---: |
-| ![Interfaz](foto_app.jpg) | ![Hardware](foto_hardware.jpg) |
+| ![Interfaz](mapa.png) | ![Hardware](prototipo.png) |
 | *Interfaz Web GPS Tracker* | *ESP32 + Módulo GPS* |
 
 *Nota: Asegúrate de reemplazar "foto_app.jpg" y "foto_hardware.jpg" por los nombres reales de tus archivos.*
@@ -35,7 +35,7 @@ Puedes visualizar la interfaz de monitoreo en el siguiente enlace:
 
 1.  Asegúrate de que tu ESP32 esté conectado a la misma red WiFi que tu dispositivo.
 2.  Configura la dirección IP de tu ESP32 en el archivo `script.js`.
-3.  Accede a la [App Online](https://miloalarcon25.github.io/) para comenzar el monitoreo.
+3.  Accede a la [App Online](https://camiloalarcon25.github.io/Sistema-de-Monitoreo-Electr-nico-V2/) para comenzar el monitoreo.
 
 ---
 *Desarrollado como parte del proyecto de monitoreo electrónico personal.*
