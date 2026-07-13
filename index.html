@@ -1,39 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>GPS Tracker Map</title>
+    <meta charset="UTF-8">
+    <title>GPS Tracker Pro</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        #map { height: 600px; width: 100%; }
-        body { margin: 0; font-family: sans-serif; }
+        body { margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+        #map { flex-grow: 1; }
+        #info { padding: 10px; background: #333; color: white; text-align: center; font-family: sans-serif; }
     </style>
 </head>
 <body>
+    <div id="info">GPS: <span id="lat">...</span>, <span id="lng">...</span></div>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const map = L.map('map').setView([0, 0], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        const map = L.map('map').setView([-33.0388, -71.3799], 15);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map); // Modo oscuro
         
         let marker = L.marker([0, 0]).addTo(map);
-        let polyline = L.polyline([], {color: 'blue'}).addTo(map);
+        let polyline = L.polyline([], {color: '#00d4ff', weight: 4}).addTo(map);
 
-        async function actualizarMapa() {
+        async function actualizar() {
             try {
-                const response = await fetch('http://192.168.1.11/coords'); // CAMBIA TU IP
-                const data = await response.json();
-                const lat = parseFloat(data.lat);
-                const lng = parseFloat(data.lng);
-
-                const newLatLng = [lat, lng];
-                marker.setLatLng(newLatLng);
-                polyline.addLatLng(newLatLng);
-                map.panTo(newLatLng);
-            } catch (e) { console.error("Error conectando al ESP32"); }
+                const res = await fetch('http://192.168.1.11/coords'); // CAMBIA TU IP AQUÍ
+                const data = await res.json();
+                const pos = [parseFloat(data.lat), parseFloat(data.lng)];
+                
+                marker.setLatLng(pos);
+                polyline.addLatLng(pos);
+                map.panTo(pos);
+                
+                document.getElementById('lat').innerText = data.lat;
+                document.getElementById('lng').innerText = data.lng;
+            } catch (e) { console.error("Sin conexión"); }
         }
-
-        setInterval(actualizarMapa, 3000);
+        setInterval(actualizar, 2000);
     </script>
 </body>
 </html>
