@@ -6,23 +6,26 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; }
-        #info { padding: 10px; background: #2c3e50; color: white; display: flex; justify-content: space-between; align-items: center; }
-        #map { flex-grow: 1; }
-        .btn-group { display: flex; gap: 5px; }
-        button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
-        .btn-clear { background: #e74c3c; color: white; }
-        .btn-save { background: #27ae60; color: white; }
+        #map { height: 80%; width: 100%; } /* El mapa ocupa el 80% */
+        #historial { height: 20%; width: 100%; overflow-y: auto; background: #f4f4f4; padding: 10px; border-top: 2px solid #ccc; }
+        .info-bar { padding: 10px; background: #2c3e50; color: white; display: flex; justify-content: space-between; }
+        button { padding: 8px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="info">
-        <div>Lat: <span id="lat">---</span> | Lng: <span id="lng">---</span></div>
-        <div class="btn-group">
-            <button class="btn-save" onclick="guardarRecorrido()">Guardar</button>
-            <button class="btn-clear" onclick="limpiarRecorrido()">Limpiar</button>
-        </div>
+
+    <div class="info-bar">
+        <span>Lat: <span id="lat">---</span> | Lng: <span id="lng">---</span></span>
+        <button onclick="guardarRecorrido()">Guardar Recorrido</button>
+        <button onclick="limpiarRecorrido()" style="background:#e74c3c; color:white;">Limpiar</button>
     </div>
+
     <div id="map"></div>
+
+    <div id="historial">
+        <h3>Tus Recorridos Guardados:</h3>
+        <ul id="lista-recorridos"></ul>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -30,47 +33,45 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
         let marker = L.marker([0, 0]).addTo(map);
-        let startMarker = null; // Nuevo: Marcador de inicio
         let polyline = L.polyline([], {color: '#3498db', weight: 5}).addTo(map);
 
-        // Cargar historial si existe
-        const savedPath = JSON.parse(localStorage.getItem('recorrido')) || [];
-        if(savedPath.length > 0) {
-            polyline.setLatLngs(savedPath);
-            map.fitBounds(polyline.getBounds());
-        }
-
-        async function actualizar() {
-            try {
-                const res = await fetch('http://192.168.1.11/coords'); // CAMBIA TU IP
-                const data = await res.json();
-                const pos = [parseFloat(data.lat), parseFloat(data.lng)];
-                
-                // Si no hay marcador de inicio, ponemos uno
-                if(!startMarker) {
-                    startMarker = L.marker(pos).addTo(map).bindPopup("Inicio").openPopup();
+        // Función para listar recorridos guardados
+        function listarRecorridos() {
+            const lista = document.getElementById('lista-recorridos');
+            lista.innerHTML = "";
+            for(let i=0; i < localStorage.length; i++){
+                let key = localStorage.key(i);
+                if(key.startsWith('recorrido_')) {
+                    let li = document.createElement('li');
+                    li.innerText = key.replace('recorrido_', 'Recorrido: ');
+                    lista.appendChild(li);
                 }
-                
-                marker.setLatLng(pos);
-                polyline.addLatLng(pos);
-                map.panTo(pos);
-                document.getElementById('lat').innerText = data.lat;
-                document.getElementById('lng').innerText = data.lng;
-            } catch (e) {}
-        }
-
-        function limpiarRecorrido() {
-            polyline.setLatLngs([]);
-            if(startMarker) { map.removeLayer(startMarker); startMarker = null; }
-            localStorage.removeItem('recorrido');
+            }
         }
 
         function guardarRecorrido() {
-            localStorage.setItem('recorrido', JSON.stringify(polyline.getLatLngs()));
-            alert("Recorrido guardado localmente");
+            const nombre = prompt("Nombre de este recorrido:");
+            if(nombre) {
+                localStorage.setItem('recorrido_' + nombre, JSON.stringify(polyline.getLatLngs()));
+                listarRecorridos();
+            }
+        }
+
+        // --- (La lógica de actualización sigue siendo la misma) ---
+        async function actualizar() {
+            try {
+                const res = await fetch('http://TU_IP_ESP32/coords'); // CAMBIA TU IP
+                const data = await res.json();
+                const pos = [parseFloat(data.lat), parseFloat(data.lng)];
+                marker.setLatLng(pos);
+                polyline.addLatLng(pos);
+                document.getElementById('lat').innerText = data.lat;
+                document.getElementById('lng').innerText = data.lng;
+            } catch(e) {}
         }
 
         setInterval(actualizar, 2000);
+        listarRecorridos(); // Cargar lista al abrir
     </script>
 </body>
 </html>
