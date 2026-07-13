@@ -2,70 +2,74 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPS Tracker Pro</title>
-    <!-- Cargamos Leaflet desde su servidor oficial -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; }
-        #info { padding: 15px; background: #2c3e50; color: white; display: flex; justify-content: space-between; align-items: center; }
+        body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; }
+        #info { padding: 10px; background: #2c3e50; color: white; display: flex; justify-content: space-between; align-items: center; }
         #map { flex-grow: 1; }
-        button { padding: 10px 20px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 5px; font-weight: bold; }
-        button:hover { background: #c0392b; }
+        .btn-group { display: flex; gap: 5px; }
+        button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-clear { background: #e74c3c; color: white; }
+        .btn-save { background: #27ae60; color: white; }
     </style>
 </head>
 <body>
-
     <div id="info">
-        <div>
-            Lat: <span id="lat">---</span> | Lng: <span id="lng">---</span>
+        <div>Lat: <span id="lat">---</span> | Lng: <span id="lng">---</span></div>
+        <div class="btn-group">
+            <button class="btn-save" onclick="guardarRecorrido()">Guardar</button>
+            <button class="btn-clear" onclick="limpiarRecorrido()">Limpiar</button>
         </div>
-        <button onclick="limpiarRecorrido()">Limpiar Mapa</button>
     </div>
-    
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Inicializamos el mapa (Centrado en una posición inicial)
         const map = L.map('map').setView([-33.0388, -71.3799], 15);
-
-        // Mapa estándar
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
         let marker = L.marker([0, 0]).addTo(map);
+        let startMarker = null; // Nuevo: Marcador de inicio
         let polyline = L.polyline([], {color: '#3498db', weight: 5}).addTo(map);
+
+        // Cargar historial si existe
+        const savedPath = JSON.parse(localStorage.getItem('recorrido')) || [];
+        if(savedPath.length > 0) {
+            polyline.setLatLngs(savedPath);
+            map.fitBounds(polyline.getBounds());
+        }
 
         async function actualizar() {
             try {
-                // REEMPLAZA TU_IP_ESP32 CON LA IP QUE TE DIO EL MONITOR SERIE
-                const res = await fetch('http://10.72.25.75/coords'); 
+                const res = await fetch('http://TU_IP_ESP32/coords'); // CAMBIA TU IP
                 const data = await res.json();
+                const pos = [parseFloat(data.lat), parseFloat(data.lng)];
                 
-                const lat = parseFloat(data.lat);
-                const lng = parseFloat(data.lng);
-                const pos = [lat, lng];
+                // Si no hay marcador de inicio, ponemos uno
+                if(!startMarker) {
+                    startMarker = L.marker(pos).addTo(map).bindPopup("Inicio").openPopup();
+                }
                 
-                // Actualizamos posición
                 marker.setLatLng(pos);
                 polyline.addLatLng(pos);
                 map.panTo(pos);
-                
-                // Actualizamos texto superior
-                document.getElementById('lat').innerText = lat.toFixed(6);
-                document.getElementById('lng').innerText = lng.toFixed(6);
-            } catch (e) {
-                console.error("Esperando conexión con el ESP32...");
-            }
+                document.getElementById('lat').innerText = data.lat;
+                document.getElementById('lng').innerText = data.lng;
+            } catch (e) {}
         }
 
         function limpiarRecorrido() {
             polyline.setLatLngs([]);
+            if(startMarker) { map.removeLayer(startMarker); startMarker = null; }
+            localStorage.removeItem('recorrido');
         }
 
-        // Refrescar cada 2 segundos
+        function guardarRecorrido() {
+            localStorage.setItem('recorrido', JSON.stringify(polyline.getLatLngs()));
+            alert("Recorrido guardado localmente");
+        }
+
         setInterval(actualizar, 2000);
     </script>
 </body>
