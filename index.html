@@ -4,74 +4,20 @@
     <meta charset="UTF-8">
     <title>GPS Tracker Pro</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; }
-        #map { height: 80%; width: 100%; } /* El mapa ocupa el 80% */
-        #historial { height: 20%; width: 100%; overflow-y: auto; background: #f4f4f4; padding: 10px; border-top: 2px solid #ccc; }
-        .info-bar { padding: 10px; background: #2c3e50; color: white; display: flex; justify-content: space-between; }
-        button { padding: 8px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
-    </style>
+    <link rel="stylesheet" href="style.css"> <!-- Archivo CSS externo -->
 </head>
 <body>
-
     <div class="info-bar">
         <span>Lat: <span id="lat">---</span> | Lng: <span id="lng">---</span></span>
-        <button onclick="guardarRecorrido()">Guardar Recorrido</button>
-        <button onclick="limpiarRecorrido()" style="background:#e74c3c; color:white;">Limpiar</button>
+        <button onclick="guardarRecorrido()">Guardar</button>
+        <button class="btn-clear" onclick="limpiarRecorrido()">Limpiar</button>
     </div>
-
     <div id="map"></div>
-
     <div id="historial">
-        <h3>Tus Recorridos Guardados:</h3>
+        <h3>Recorridos:</h3>
         <ul id="lista-recorridos"></ul>
     </div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        const map = L.map('map').setView([-33.0388, -71.3799], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        
-        let marker = L.marker([0, 0]).addTo(map);
-        let polyline = L.polyline([], {color: '#3498db', weight: 5}).addTo(map);
-
-        // Función para listar recorridos guardados
-        function listarRecorridos() {
-            const lista = document.getElementById('lista-recorridos');
-            lista.innerHTML = "";
-            for(let i=0; i < localStorage.length; i++){
-                let key = localStorage.key(i);
-                if(key.startsWith('recorrido_')) {
-                    let li = document.createElement('li');
-                    li.innerText = key.replace('recorrido_', 'Recorrido: ');
-                    lista.appendChild(li);
-                }
-            }
-        }
-
-        function guardarRecorrido() {
-            const nombre = prompt("Nombre de este recorrido:");
-            if(nombre) {
-                localStorage.setItem('recorrido_' + nombre, JSON.stringify(polyline.getLatLngs()));
-                listarRecorridos();
-            }
-        }
-
-        // --- (La lógica de actualización sigue siendo la misma) ---
-        async function actualizar() {
-            try {
-                const res = await fetch('http://TU_IP_ESP32/coords'); // CAMBIA TU IP
-                const data = await res.json();
-                const pos = [parseFloat(data.lat), parseFloat(data.lng)];
-                marker.setLatLng(pos);
-                polyline.addLatLng(pos);
-                document.getElementById('lat').innerText = data.lat;
-                document.getElementById('lng').innerText = data.lng;
-            } catch(e) {}
-        }
-
-        setInterval(actualizar, 2000);
-        listarRecorridos(); // Cargar lista al abrir
-    </script>
+    <script src="script.js"></script> <!-- Archivo JS externo -->
 </body>
 </html>
