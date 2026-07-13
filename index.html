@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <title>GPS Tracker Pro</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css"> <!-- Archivo CSS externo -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="info-bar">
-        <span>Lat: <span id="lat">---</span> | Lng: <span id="lng">---</span></span>
-        <button onclick="guardarRecorrido()">Guardar</button>
-        <button class="btn-clear" onclick="limpiarRecorrido()">Limpiar</button>
+        <div>Lat: <span id="lat">---</span> | Lng: <span id="lng">---</span></div>
+        <div>
+            <button class="btn-save" onclick="guardarRecorrido()">Guardar</button>
+            <button class="btn-clear" onclick="limpiarRecorrido()">Limpiar</button>
+        </div>
     </div>
     <div id="map"></div>
-<div id="historial">
-    <h3>Historial:</h3>
-    <ul id="lista-recorridos"></ul>
-    <!-- Agrega esto para ver datos en vivo -->
-    <div id="status-vivo" style="font-weight:bold; color: #2c3e50;">
-        Distancia: <span id="dist-val">0</span> km
+    <div id="historial">
+        <h3>Historial:</h3>
+        <ul id="lista-recorridos"></ul>
+        <div id="status-vivo" style="font-weight:bold; color: #2c3e50;">
+            Distancia Total: <span id="dist-val">0</span> km
+        </div>
     </div>
-</div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="script.js"></script> <!-- Archivo JS externo -->
+    <script src="script.js"></script>
 </body>
 </html>
