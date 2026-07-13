@@ -13,10 +13,14 @@
         <button class="btn-clear" onclick="limpiarRecorrido()">Limpiar</button>
     </div>
     <div id="map"></div>
-    <div id="historial">
-        <h3>Recorridos:</h3>
-        <ul id="lista-recorridos"></ul>
+<div id="historial">
+    <h3>Historial:</h3>
+    <ul id="lista-recorridos"></ul>
+    <!-- Agrega esto para ver datos en vivo -->
+    <div id="status-vivo" style="font-weight:bold; color: #2c3e50;">
+        Distancia: <span id="dist-val">0</span> km
     </div>
+</div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script> <!-- Archivo JS externo -->
 </body>
