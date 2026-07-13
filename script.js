@@ -6,7 +6,7 @@ let polyline = L.polyline([], {color: '#3498db', weight: 5}).addTo(map);
 
 async function actualizar() {
     try {
-        const res = await fetch('http://192.168.1.11/coords'); // CAMBIA TU IP
+        const res = await fetch('http://10.72.25.75/coords'); // CAMBIA TU IP DESDE CELU 10.72.25.75 DESDE ROUTER 192.168.1.11
         const data = await res.json();
         const pos = [parseFloat(data.lat), parseFloat(data.lng)];
         marker.setLatLng(pos);
