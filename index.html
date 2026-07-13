@@ -17,11 +17,13 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const map = L.map('map').setView([-33.0388, -71.3799], 15);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map); // Modo oscuro
+       // L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);// Modo oscuro
         
         let marker = L.marker([0, 0]).addTo(map);
         let polyline = L.polyline([], {color: '#00d4ff', weight: 4}).addTo(map);
-
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
         async function actualizar() {
             try {
                 const res = await fetch('http://192.168.1.11/coords'); // CAMBIA TU IP AQUÍ
